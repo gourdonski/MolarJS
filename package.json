@@ -1,0 +1,46 @@
+{
+  "name": "molar",
+  "version": "1.46.0",
+  "keywords": [
+    "collections",
+    "lookup",
+    "ttl",
+    "mapper",
+    "mapping",
+    "versioning",
+    "mutant",
+    "range",
+    "interval",
+    "intersect",
+    "date",
+    "scheduler",
+    "availability"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "karma": "karma start --browser=Chrome --debug"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-flatten": "^0.2.0",
+    "gulp-jshint": "^1.11.2",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^1.4.1",
+    "jasmine-core": "^2.3.4",
+    "karma": "^0.13.10",
+    "karma-chrome-launcher": "^0.2.1",
+    "karma-jasmine": "^0.3.6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lintmouse/MolarJS.git"
+  },
+  "author": "lintmouse",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lintmouse/MolarJS/issues"
+  },
+  "homepage": "https://github.com/lintmouse/MolarJS"
+}
