@@ -30,7 +30,8 @@
             return ready.constants.MAX_DATE;
 
         //Don't want to alter the original time, so create local copy.
-        var t = new Date(time), year = ready.helpers.intersectField(this.expression.year, t.getFullYear());
+        var t = new Date(time), 
+            year = ready.helpers.intersectField(this.expression.year, t.getFullYear());
 
         if (year == null)
             return null;
@@ -45,7 +46,7 @@
         var dayOfMonth = ready.helpers.intersectField(this.expression.dayOfMonth, t.getDate()),
             dayOfWeek = ready.helpers.intersectField(this.expression.dayOfWeek, t.getDay());
 
-        //Seems when both day of month and day of week specified in cron, it honors both, so doing that here for now.
+        //When both day of month and day of week specified in cron, it honors both.
         if (dayOfMonth == null && dayOfWeek == null)
             return null;
 

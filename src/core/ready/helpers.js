@@ -49,7 +49,7 @@
     };
 
     helpers.parseField = function(field, fieldName) {
-        var isBlockField = this.isBlockField(fieldName),
+        var isBlockField = helpers.isBlockField(fieldName),
             match = field.match(rangeRegex),
             parsed,
             map;

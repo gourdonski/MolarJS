@@ -62,7 +62,7 @@ declare namespace molar {
     }
 
     interface ILookupStatic {
-        new(allowDuplicate: boolean, ttlInMilliseconds: number): ILookup;
+        new(allowDuplicate?: boolean, ttlInMilliseconds?: number): ILookup;
     }
 
     interface ILookup {
