@@ -66,7 +66,7 @@ declare namespace molar {
     }
 
     interface ILookup {
-        add(key: any, value: any): boolean;
+        add(key: any, value: any, onDestroy?: Function): boolean;
         load(data: any[], key: any, transform?: Function): ILookup;
         clear(): void;
         removeBy(predicate: Function): number;

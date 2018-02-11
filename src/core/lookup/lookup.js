@@ -20,7 +20,7 @@
     }
 
     //Should look into grouping duplicates by key for faster retrieval.  Just need to handle expiration setting on groups of items.
-    Lookup.prototype.add = function(key, value) {
+    Lookup.prototype.add = function(key, value, onDestroy) {
         //Default behavior is to allow duplicates.
         if (this.allowDuplicate !== false || !this.contains(key)) {
             var timestamp = new Date(), expiration = null;
@@ -30,7 +30,7 @@
                 expiration.setMilliseconds(expiration.getMilliseconds() + this.ttl);
             }
 
-            this._collection.push(new LookupItem(key, value, timestamp, expiration));
+            this._collection.push(new LookupItem(key, value, timestamp, expiration, onDestroy));
 
             return true;
         }
@@ -60,11 +60,21 @@
         var _predicate = this.ttl ? ttlRemovePredicate(predicate) : predicate,
             matches = [],
             removed = 0,
-            length = this._collection.length;
+            length = this._collection.length,
+            self = this;
 
-        for (var i = 0; i < length; i++)
-            if (_predicate(this._collection[i]))
-                matches.unshift(i); //FILO to not change index of adjacent matches as we remove current.
+        for (var i = 0; i < length; i++) {
+            (function(_i) {
+                var item = self._collection[_i];
+
+                if (_predicate(item)) {
+                    if (molar.helpers.isFunction(item.onDestroy))
+                        item.onDestroy();
+
+                    matches.unshift(_i); //FILO to not change index of adjacent matches as we remove current.
+                }
+            })(i);
+        }
 
         for (var m = 0; m < matches.length; m++) {
             this._collection.splice(matches[m], 1);
@@ -77,14 +87,24 @@
 
     Lookup.prototype.removeFirst = function(predicate) {
         var _predicate = this.ttl ? ttlRemovePredicate(predicate) : predicate,
-            length = this._collection.length;
+            length = this._collection.length,
+            self = this;
 
         for (var i = 0; i < length; i++)
-            if (_predicate(this._collection[i])) {
-                this._collection.splice(i, 1);
+            if ((function(_i) {
+                var item = self._collection[_i];
 
-                return true;
-            }
+                if (_predicate(item)) {
+                    if (molar.helpers.isFunction(item.onDestroy))
+                        item.onDestroy();
+                    
+                    self._collection.splice(_i, 1);
+
+                    return true;
+                }
+
+                return false;
+            })(i)) return true;
 
         return false;
     };
@@ -136,8 +156,12 @@
             for (i = 0; i < length; i++) {
                 item = this._collection[i];
 
-                if (isExpired(item))
+                if (isExpired(item)) {
                     expired.push(i);
+
+                    if (molar.helpers.isFunction(item.onDestroy))
+                        item.onDestroy();
+                }
                 else if (predicate(item))
                     matches.push(item.value);
             }
@@ -170,6 +194,9 @@
 
                 if (isExpired(item)) {
                     expired.push(i);
+
+                    if (molar.helpers.isFunction(item.onDestroy))
+                        item.onDestroy();
 
                     if (predicate(item))
                         break;
@@ -251,11 +278,12 @@
         return this.values().length;
     };
 
-    function LookupItem(key, value, timestamp, expiration) {
+    function LookupItem(key, value, timestamp, expiration, onDestroy) {
         this.key = key;
         this.value = value;
         this.timestamp = timestamp;
         this.expiration = expiration;
+        this.onDestroy = onDestroy;
     }
 
     function isExpired(lookupItem) {
